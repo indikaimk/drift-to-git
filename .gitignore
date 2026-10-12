@@ -1,0 +1,19 @@
+# Binaries
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test artifacts
+*.out
+*.test
+
+# Secrets & local env
+deploy/secret.yaml
+.env
+
+# IDE
+.idea/
+.vscode/

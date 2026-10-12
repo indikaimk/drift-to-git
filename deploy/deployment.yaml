@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: drift-to-git
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: drift-to-git
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: drift-to-git
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: drift-to-git
+    spec:
+      serviceAccountName: drift-to-git
+      containers:
+        - name: controller
+          image: drift-to-git:latest
+          command:
+            - /drift-to-git
+            - run
+          env:
+            - name: ARGOCD_SERVER
+              value: "https://argocd-server.argocd.svc:443"
+            - name: ARGOCD_INSECURE
+              value: "true"
+            - name: POLL_INTERVAL
+              value: "60s"
+            - name: DRY_RUN
+              value: "false"
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: drift-to-git-secret
+                  key: GITHUB_TOKEN
+            - name: ARGOCD_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: drift-to-git-secret
+                  key: ARGOCD_AUTH_TOKEN
+                  optional: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
